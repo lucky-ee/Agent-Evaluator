@@ -159,6 +159,10 @@ def answer_matches(got: Any, expected: Any) -> bool:
         return False
     g, e = to_number(got), to_number(expected)
     if g is not None and e is not None:
+        # Exact when both sides are exact; floats can't hold big integers
+        # (e.g. 10**22 + 1000 vs 10**22) and rel_tol would wave them through.
+        if isinstance(g, Fraction) and isinstance(e, Fraction):
+            return g == e
         return math.isclose(float(g), float(e), rel_tol=REL_TOL, abs_tol=ABS_TOL)
     got_text, expected_text = normalize_text(got), normalize_text(expected)
     if not got_text or not expected_text:

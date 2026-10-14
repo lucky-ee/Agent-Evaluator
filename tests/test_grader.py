@@ -146,8 +146,10 @@ def test_parse_answer_last_candidate_wins_across_formats():
     assert parse_answer(final) == "41"
 
 
-def test_fraction_vs_decimal_string_within_tolerance():
-    assert answer_matches("1/3", "0.333333333333")
+def test_fraction_vs_decimal_string_is_exact():
+    # both strings parse to Fraction, so no tolerance: a truncated decimal isn't 1/3
+    assert not answer_matches("1/3", "0.333333333333")
+    assert answer_matches("1/4", "0.25")
 
 
 def test_answer_matches_none_is_never_a_match():
@@ -181,3 +183,7 @@ def test_correct_result_has_checkpoints_hit():
 def test_unknown_termination_raises():
     with pytest.raises(ValueError):
         grade(TASK, traj(GOOD_STEPS, termination="timeout"))
+
+def test_big_integers_compare_exactly():
+    assert not answer_matches(10**22 + 1000, 10**22)
+    assert answer_matches(10**22, 10**22)
